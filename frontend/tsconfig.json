@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "incremental": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",      // thay vì "node"
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    // "baseUrl": ".",                  // đã xóa (deprecated)
+    "paths": {
+      "@/*": ["./src/*"]                // vẫn hoạt động nhờ relative path
+    },
+    "plugins": [{ "name": "next" }]
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts",
+    "**/*.ts",
+    "src/types/**/*.d.ts", 
+    "**/*.tsx"
+, "src/app/admin/layout.tsx"  ],
+  "exclude": ["node_modules"]
+}

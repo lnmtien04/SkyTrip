@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://skytrip.onrender.com'],
+  origin: ['http://localhost:3000', 'https://skytrip.onrender.com', 'http://localhost:8080', 'http://127.0.0.1:8080'],
   credentials: true
 }));
 
@@ -18,15 +18,41 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.log('❌ MongoDB connection error:', err));
 
-// Import routes
-const authRoutes = require('./routes/auth');
-const adminRoutes = require('./routes/admin');
-const placeRoutes = require('./routes/placesRoutes'); // dùng file placesRoutes.js
-
+// Routes
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const placeRoutes = require('./routes/placeRoutes');
+const postRoutes = require('./routes/postRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+const reviewRoutes = require('./routes/reviewRoutes'); // CHỈ MỘT LẦN
+const mediaRoutes = require('./routes/mediaRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const statsRoutes = require('./routes/statsRoutes');
+const pageRoutes = require('./routes/pageRoutes');
+const publicRoutes = require('./routes/publicRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+//
+app.use('/api/payment', paymentRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/places', placeRoutes);
-
+app.use('/api/admin/users', userRoutes);
+app.use('/api/admin/places', placeRoutes);
+app.use('/api/admin/posts', postRoutes);
+app.use('/api/admin/categories', categoryRoutes);
+app.use('/api/admin/bookings', bookingRoutes);
+app.use('/api/admin/reviews', reviewRoutes);
+app.use('/api/admin/media', mediaRoutes);
+app.use('/api/admin/settings', settingsRoutes);
+app.use('/api/admin/dashboard', dashboardRoutes);
+app.use('/api/admin/stats', statsRoutes);
+app.use('/api/admin/pages', pageRoutes);
+app.use('/api/public', publicRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/uploads', express.static('uploads'));
+app.use('/api/categories', categoryRoutes);
+app.use('/api/admin/analytics', analyticsRoutes);
 app.get('/', (req, res) => {
   res.json({ message: 'SkyTrip API is running' });
 });

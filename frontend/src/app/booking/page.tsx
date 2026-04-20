@@ -1,5 +1,6 @@
-'use client';
+"use client";
 
+import { Suspense } from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, User, Phone, Mail, Calendar, Users, MapPin, CreditCard, Info } from 'lucide-react';
@@ -18,7 +19,7 @@ interface Place {
   duration: number; // số ngày của tour
 }
 
-export default function BookingPage() {
+function BookingClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const placeId = searchParams.get('placeId');
@@ -401,5 +402,13 @@ export default function BookingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={<div style={{ textAlign: 'center', padding: '50px' }}>Đang tải trang đặt tour...</div>}>
+      <BookingClient />
+    </Suspense>
   );
 }

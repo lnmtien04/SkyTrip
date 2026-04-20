@@ -6,8 +6,8 @@ const placeSchema = new mongoose.Schema({
   category: { type: String, required: true },
   address: { type: String, required: true },
   image: { type: String, default: '' },
-  lat: { type: Number, required: true },
-  lng: { type: Number, required: true },
+ lat: { type: Number, default: 0 },     // bỏ required
+lng: { type: Number, default: 0 },
   rating: { type: Number, default: 0 },
   isActive: { type: Boolean, default: true },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

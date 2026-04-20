@@ -1,8 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-
-const TravelMap = dynamic(() => import('@/components/TravelMap'), { ssr: false });
 
 export default function AdminMapPage() {
   const [places, setPlaces] = useState([]);
@@ -14,10 +11,11 @@ export default function AdminMapPage() {
   }, []);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Quản lý bản đồ</h1>
-      <div className="bg-white p-4 rounded-lg shadow">
-        <TravelMap places={places} />
+    <div style={{ padding: '24px' }}>
+      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '16px' }}>Quản lý bản đồ</h1>
+      <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <p>Bản đồ đang được phát triển. Số lượng địa điểm: {places.length}</p>
+        {/* Sau này có thể thêm Google Maps hoặc Leaflet */}
       </div>
     </div>
   );

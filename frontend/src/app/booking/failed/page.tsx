@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { XCircle } from 'lucide-react';
 
-export default function BookingFailedPage() {
+function FailedContent() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9fafb' }}>
       <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '40px', textAlign: 'center', maxWidth: '500px' }}>
@@ -13,5 +14,13 @@ export default function BookingFailedPage() {
         <Link href="/" style={{ display: 'inline-block', marginTop: '20px', color: '#f97316', textDecoration: 'none' }}>Quay lại trang chủ</Link>
       </div>
     </div>
+  );
+}
+
+export default function BookingFailedPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Đang tải...</div>}>
+      <FailedContent />
+    </Suspense>
   );
 }

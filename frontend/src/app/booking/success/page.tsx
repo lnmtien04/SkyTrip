@@ -1,11 +1,13 @@
-'use client';
+"use client";
 
+import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
 
-export default function BookingSuccessPage() {
+// Component con chứa logic client
+function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [countdown, setCountdown] = useState(5);
@@ -34,5 +36,14 @@ export default function BookingSuccessPage() {
         <Link href="/" style={{ display: 'inline-block', marginTop: '20px', color: '#f97316', textDecoration: 'none' }}>Quay lại trang chủ ngay</Link>
       </div>
     </div>
+  );
+}
+
+// Page chính bọc Suspense
+export default function BookingSuccessPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Đang tải...</div>}>
+      <SuccessContent />
+    </Suspense>
   );
 }

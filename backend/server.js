@@ -11,7 +11,8 @@ app.use(cors({
     'https://skytrip.onrender.com',
     'http://localhost:8080',
     'http://127.0.0.1:8080',
-    'https://skytrip-frontend.onrender.com'  // THÊM DÒNG NÀY
+    'https://skytrip-frontend.onrender.com',  // Thêm dòng này
+    'https://skytrip.vercel.app'              // Nếu dùng Vercel
   ],
   credentials: true
 }));

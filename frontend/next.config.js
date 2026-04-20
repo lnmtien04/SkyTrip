@@ -9,7 +9,14 @@ const nextConfig = {
       },
     ],
   },
-  // Không dùng rewrites nữa, dùng biến môi trường
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:5000/api/:path*', // Proxy đến backend
+      },
+    ];
+  },
 };
 
 export default nextConfig;

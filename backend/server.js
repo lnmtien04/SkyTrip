@@ -6,7 +6,13 @@ require('dotenv').config();
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://skytrip.onrender.com', 'http://localhost:8080', 'http://127.0.0.1:8080'],
+  origin: [
+    'http://localhost:3000',
+    'https://skytrip.onrender.com',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    'https://skytrip-frontend.onrender.com'  // THÊM DÒNG NÀY
+  ],
   credentials: true
 }));
 

@@ -135,13 +135,24 @@ router.get('/reviews/recent', async (req, res) => {
 });
 
 // ==================== SETTINGS ====================
-// Lấy cài đặt hệ thống
+// Lấy cài đặt công khai (không cần auth)
 router.get('/settings', async (req, res) => {
   try {
+    const Setting = require('../models/Setting');
     let settings = await Setting.findOne();
-    if (!settings) settings = new Setting();
+    if (!settings) {
+      // Trả về settings mặc định nếu chưa có
+      settings = {
+        siteName: 'SkyTrip',
+        siteDescription: 'Hệ thống đặt tour du lịch trực tuyến',
+        contactEmail: 'contact@skytrip.com',
+        contactPhone: '1900xxxx',
+        address: 'Việt Nam'
+      };
+    }
     res.json(settings);
   } catch (err) {
+    console.error('Error fetching public settings:', err);
     res.status(500).json({ error: err.message });
   }
 });

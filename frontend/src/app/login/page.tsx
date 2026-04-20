@@ -17,17 +17,27 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
-    // Bỏ validation email client-side, để backend xử lý
-    // (backend sẽ kiểm tra email hoặc username)
     const result = await login(email, password);
     if (result.success) {
-      router.push('/admin');
+      // Lấy user từ localStorage (đã được lưu trong AuthContext khi login)
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        if (user.role === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/');
+        }
+      } else {
+        // Fallback: nếu không có user, về trang chủ
+        router.push('/');
+      }
     } else {
       setError(result.error || 'Đăng nhập thất bại');
     }
   };
 
-  // Styles
+  // Styles giữ nguyên như code của bạn
   const pageStyle: React.CSSProperties = {
     minHeight: '100vh',
     background: 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 50%, #e0f2fe 100%)',
@@ -61,7 +71,7 @@ export default function LoginPage() {
 
   const subtitleStyle: React.CSSProperties = {
     textAlign: 'center',
-    color: '#4b5563', // đậm hơn
+    color: '#4b5563',
     fontSize: '14px',
     marginBottom: '32px',
   };

@@ -6,7 +6,13 @@ import { Search, RefreshCw, Trash2, Eye, Edit, Printer } from 'lucide-react';
 interface Booking {
   _id: string;
   user: { name: string; email: string };
-  place: { name: string; basePrice?: number };
+  place: {
+    name: string;
+    basePrice?: number;
+    priceAdult?: number;
+    priceChild?: number;
+    priceInfant?: number;
+  };
   departureDate: string;
   endDate: string;
   adults: number;
@@ -32,7 +38,6 @@ export default function AdminBookingsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
-  // Modal states
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -48,7 +53,6 @@ export default function AdminBookingsPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const DEFAULT_PRICE = 500000;
 
-  // Fetch bookings
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
@@ -83,16 +87,24 @@ export default function AdminBookingsPage() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Tính tổng tiền
+  // Hàm tính tổng tiền CHÍNH XÁC
   const computeTotalPrice = (booking: Booking): number => {
+    // 1. Nếu backend đã lưu totalPrice thì dùng luôn
     if (booking.totalPrice && booking.totalPrice > 0) return booking.totalPrice;
-    const basePrice = booking.place?.basePrice || DEFAULT_PRICE;
-    const adultTotal = (booking.adults || 0) * basePrice;
-    const childTotal = (booking.children || 0) * basePrice * 0.5;
-    return adultTotal + childTotal;
+
+    // 2. Lấy giá từ place (ưu tiên priceAdult, priceChild, priceInfant)
+    const adultPrice = booking.place?.priceAdult ?? booking.place?.basePrice ?? DEFAULT_PRICE;
+    const childPrice = booking.place?.priceChild ?? (booking.place?.basePrice ? booking.place.basePrice * 0.5 : DEFAULT_PRICE * 0.5);
+    const infantPrice = booking.place?.priceInfant ?? 0;
+
+    const adultTotal = (booking.adults || 0) * adultPrice;
+    const childTotal = (booking.children || 0) * childPrice;
+    const infantTotal = (booking.infants || 0) * infantPrice;
+
+    return adultTotal + childTotal + infantTotal;
   };
 
-  // Cập nhật trạng thái nhanh
+  // Các hàm xử lý khác (giữ nguyên)
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     try {
       const token = localStorage.getItem('token');
@@ -108,7 +120,6 @@ export default function AdminBookingsPage() {
     }
   };
 
-  // Xóa booking
   const handleDelete = async (id: string) => {
     if (!confirm('Bạn có chắc muốn xóa booking này?')) return;
     try {
@@ -120,13 +131,11 @@ export default function AdminBookingsPage() {
     }
   };
 
-  // Mở modal chi tiết
   const openDetailModal = (booking: Booking) => {
     setSelectedBooking(booking);
     setIsDetailModalOpen(true);
   };
 
-  // Mở modal sửa
   const openEditModal = (booking: Booking) => {
     setSelectedBooking(booking);
     setEditForm({
@@ -140,7 +149,6 @@ export default function AdminBookingsPage() {
     setIsEditModalOpen(true);
   };
 
-  // Lưu chỉnh sửa
   const handleEditSubmit = async () => {
     if (!selectedBooking) return;
     try {
@@ -163,7 +171,6 @@ export default function AdminBookingsPage() {
     }
   };
 
-  // In hóa đơn
   const printInvoice = (booking: Booking) => {
     const total = computeTotalPrice(booking);
     const printWindow = window.open('', '_blank');
@@ -196,7 +203,6 @@ export default function AdminBookingsPage() {
     printWindow.print();
   };
 
-  // Helper format
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '--';
     const date = new Date(dateStr);
@@ -204,7 +210,7 @@ export default function AdminBookingsPage() {
   };
   const formatPrice = (price: number) => price.toLocaleString('vi-VN') + ' VND';
 
-  // Styles (giữ nguyên, có thể thêm cho modal)
+  // Styles (giữ nguyên)
   const modalOverlayStyle: React.CSSProperties = {
     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)',
     display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000,
@@ -215,8 +221,6 @@ export default function AdminBookingsPage() {
   };
   const inputStyle: React.CSSProperties = { padding: '8px', borderRadius: '8px', border: '1px solid #ccc', width: '100%' };
   const buttonStyle: React.CSSProperties = { padding: '8px 16px', borderRadius: '8px', border: 'none', cursor: 'pointer', marginRight: '8px' };
-
-  // Các style khác giữ nguyên từ code cũ (đã có)
   const containerStyle: React.CSSProperties = { padding: '24px' };
   const headerStyle: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' };
   const titleStyle: React.CSSProperties = { fontSize: '28px', fontWeight: 'bold', color: '#1f2937' };

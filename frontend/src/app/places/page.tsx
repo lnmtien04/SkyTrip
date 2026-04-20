@@ -72,8 +72,6 @@ export default function PlacesPage() {
             { _id: '3', name: 'Du lịch thành phố', slug: 'thanh-pho' },
             { _id: '4', name: 'Di tích lịch sử', slug: 'di-tich' },
             { _id: '5', name: 'Du lịch sinh thái', slug: 'sinh-thai' },
-            
-           
             { _id: '8', name: 'Văn hóa – lễ hội', slug: 'van-hoa' },
             { _id: '9', name: 'Ẩm thực', slug: 'am-thuc' },
           ]);
@@ -131,9 +129,9 @@ export default function PlacesPage() {
   };
 
   const SkeletonCard = () => (
-    <div style={{ backgroundColor: 'white', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+    <div style={{ backgroundColor: 'white', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column' }}>
       <div style={{ width: '100%', height: '180px', backgroundColor: '#e5e7eb', animation: 'pulse 1.5s infinite' }} />
-      <div style={{ padding: '16px' }}>
+      <div style={{ padding: '16px', flex: 1 }}>
         <div style={{ width: '70%', height: '20px', backgroundColor: '#e5e7eb', borderRadius: '4px', marginBottom: '8px' }} />
         <div style={{ width: '90%', height: '16px', backgroundColor: '#e5e7eb', borderRadius: '4px', marginBottom: '8px' }} />
         <div style={{ width: '40%', height: '16px', backgroundColor: '#e5e7eb', borderRadius: '4px' }} />
@@ -152,12 +150,24 @@ export default function PlacesPage() {
   const categoryFilterStyle: React.CSSProperties = { display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '8px', marginBottom: '32px', justifyContent: 'flex-start', scrollbarWidth: 'thin' };
   const categoryBtnStyle = (isActive: boolean): React.CSSProperties => ({ padding: '8px 20px', borderRadius: '40px', border: isActive ? '2px solid #f97316' : '1px solid #e2e8f0', backgroundColor: isActive ? '#f97316' : 'white', color: isActive ? 'white' : '#374151', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' });
   const gridStyle: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px', marginBottom: '40px' };
-  const cardStyle: React.CSSProperties = { backgroundColor: 'white', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', transition: 'transform 0.2s, box-shadow 0.2s', cursor: 'pointer' };
+  // Sửa cardStyle: thêm display flex, flexDirection column, height: 100% để đồng đều
+  const cardStyle: React.CSSProperties = { 
+    backgroundColor: 'white', 
+    borderRadius: '16px', 
+    overflow: 'hidden', 
+    boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
+    transition: 'transform 0.2s, box-shadow 0.2s', 
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%'  // đảm bảo card trong grid lấp đầy ô
+  };
   const imageStyle: React.CSSProperties = { width: '100%', height: '200px', objectFit: 'cover' };
-  const cardContentStyle: React.CSSProperties = { padding: '16px' };
+  // cardContentStyle: thêm flex: 1 để đẩy nội dung xuống dưới, giúp các card bằng nhau
+  const cardContentStyle: React.CSSProperties = { padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' };
   const placeNameStyle: React.CSSProperties = { fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '6px', color: '#1f2937' };
   const placeAddressStyle: React.CSSProperties = { fontSize: '0.85rem', color: '#6b7280', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' };
-  const ratingStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: '4px', color: '#f97316', fontSize: '0.9rem' };
+  const ratingStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: '4px', color: '#f97316', fontSize: '0.9rem', marginTop: 'auto' }; // thêm marginTop auto để đẩy xuống cuối
   const emptyStateStyle: React.CSSProperties = { textAlign: 'center', padding: '60px 20px', backgroundColor: 'white', borderRadius: '24px', marginBottom: '40px' };
   const sectionTitleStyle: React.CSSProperties = { fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' };
   const paginationStyle: React.CSSProperties = { display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '32px' };

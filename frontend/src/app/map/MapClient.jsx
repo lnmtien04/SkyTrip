@@ -102,14 +102,15 @@ export default function MapClient() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const mapRef = useRef();
 
+  // SỬA: categories với value đúng tên danh mục từ database
   const categories = [
     { value: '', label: 'Tất cả', icon: Sparkles },
-    { value: 'beach', label: 'Biển', icon: Waves },
-    { value: 'mountain', label: 'Núi', icon: Mountain },
-    { value: 'city', label: 'Thành phố', icon: Building2 },
-    { value: 'culture', label: 'Văn hóa', icon: Landmark },
-    { value: 'food', label: 'Ẩm thực', icon: Utensils },
-    { value: 'spiritual', label: 'Tâm linh', icon: Church },
+    { value: 'Du lịch biển', label: 'Biển', icon: Waves },
+    { value: 'Du lịch núi', label: 'Núi', icon: Mountain },
+    { value: 'Du lịch thành phố', label: 'Thành phố', icon: Building2 },
+    { value: 'Văn hóa – lễ hội', label: 'Văn hóa', icon: Landmark },
+    { value: 'Ẩm thực', label: 'Ẩm thực', icon: Utensils },
+    { value: 'Tâm linh', label: 'Tâm linh', icon: Church },
   ];
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -140,7 +141,6 @@ export default function MapClient() {
 
   const fetchPlaces = async () => {
     try {
-      // SỬA: gọi đúng endpoint public
       const res = await fetch(`${API_URL}/public/places?limit=100`);
       const data = await res.json();
       setPlaces(data.places || []);

@@ -80,11 +80,11 @@ exports.getBookings = async (req, res) => {
     if (statusFilter && statusFilter !== 'all') query.status = statusFilter;
     
     const bookings = await Booking.find(query)
-      .populate('user', 'name email')
-      .populate('place', 'name address')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+  .populate('user', 'name email')
+  .populate('place', 'name address priceAdult priceChild priceInfant') // thêm priceAdult,...
+  .sort({ createdAt: -1 })
+  .skip(skip)
+  .limit(limit);
     const total = await Booking.countDocuments(query);
     res.json({
       bookings,

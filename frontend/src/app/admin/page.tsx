@@ -3,40 +3,82 @@
 import { useState, useEffect } from 'react';
 import { Users, MapPin, FileText, Eye, TrendingUp, TrendingDown, Activity, Calendar } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useRouter } from 'next/navigation';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [stats, setStats] = useState({ users: 0, locations: 0, posts: 0, views: 0 });
   const [chartData, setChartData] = useState([]);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
+    // ---- CÁCH KIỂM TRA QUYỀN MỚI - chỉ dùng user từ localStorage ----
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        if (user.role !== 'admin') {
+          setError('Bạn không có quyền truy cập trang quản trị.');
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        setError('Dữ liệu người dùng không hợp lệ.');
+        setLoading(false);
+        return;
+      }
+    } else {
+      // fallback: giải mã token để lấy role
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.role !== 'admin') {
+          setError('Bạn không có quyền truy cập trang quản trị.');
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        setError('Token không hợp lệ');
+        setLoading(false);
+        return;
+      }
+    }
+
     const fetchDashboard = async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL;
-        const token = localStorage.getItem('token');
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-
-        // Gọi API dashboard tổng hợp (đã có dữ liệu thật)
-        const res = await fetch(`${API_URL}/admin/dashboard`, { headers });
-        if (!res.ok) throw new Error('Failed to fetch dashboard');
+        const res = await fetch(`${API_URL}/admin/dashboard`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) {
+          if (res.status === 403) setError('Bạn không có quyền truy cập.');
+          else setError(`Lỗi ${res.status}: ${await res.text()}`);
+          return;
+        }
         const data = await res.json();
-
         setStats(data.stats);
         setChartData(data.chartData);
         setActivities(data.recentActivities);
-      } catch (error) {
-        console.error('Lỗi tải dashboard:', error);
+      } catch (err) {
+        setError('Không thể tải dữ liệu');
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboard();
-  }, []);
+  }, [router]);
 
-  if (loading) return <div style={{ padding: '24px' }}>Đang tải dữ liệu...</div>;
+  if (loading) return <div>Đang tải...</div>;
+  if (error) return <div style={{ padding: '24px', color: 'red' }}>{error}</div>;
 
   const statCards = [
     { title: 'Tổng người dùng', value: stats.users, icon: Users, change: '+12%', up: true },

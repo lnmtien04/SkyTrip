@@ -11,7 +11,7 @@ router.get('/places/featured', async (req, res) => {
   try {
     const places = await Place.find({ isActive: true })
       .sort({ rating: -1, createdAt: -1 })
-      .limit(6)
+      .limit(8)
       .select('name image category address rating');
     res.json(places);
   } catch (err) {
@@ -63,7 +63,7 @@ router.get('/posts/recent', async (req, res) => {
   try {
     const posts = await Post.find({ status: 'published' })
       .sort({ createdAt: -1 })
-      .limit(3)
+      .limit(4)
       .populate('author', 'name')
       .select('title excerpt image createdAt author views');
     res.json(posts);

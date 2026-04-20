@@ -2,31 +2,14 @@
 import '../globals.css';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
-  LayoutDashboard,
-  Users,
-  MapPin,
-  FileText,
-  Settings,
-  LogOut,
-  Bell,
-  Search,
-  User,
-  Tag,
-  Compass,
-  Calendar,
-  Star,
-  Image,
-  File,
-  BarChart3,
-  Download,
-  Mail,
-  Home, // thêm icon Home
+  LayoutDashboard, Users, MapPin, FileText, Settings, LogOut, Bell, Search, User,
+  Tag, Compass, Calendar, Star, Image, File, BarChart3, Home
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext'; // import useAuth
 
 const menuItems = [
-  { name: 'Trang chủ', href: '/', icon: Home }, // thêm mục mới
+  { name: 'Trang chủ', href: '/', icon: Home },
   { name: 'Tổng quan hệ thống', href: '/admin', icon: LayoutDashboard },
   { name: 'Quản lý tài khoản', href: '/admin/users', icon: Users },
   { name: 'Quản lý địa điểm', href: '/admin/locations', icon: MapPin },
@@ -43,18 +26,59 @@ const menuItems = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout } = useAuth(); // lấy hàm logout
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    const checkAccess = () => {
+      // 1. Lấy user từ localStorage
+      const storedUser = localStorage.getItem('user');
+      let role = null;
+      if (storedUser) {
+        try {
+          const user = JSON.parse(storedUser);
+          role = user.role;
+        } catch (e) {}
+      }
+      // 2. Nếu không có user, thử lấy từ token
+      if (!role) {
+        const token = localStorage.getItem('token');
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            role = payload.role;
+          } catch (e) {}
+        }
+      }
+      // 3. Nếu role là admin -> cho phép
+      if (role === 'admin') {
+        setAuthorized(true);
+      } else {
+        // Không phải admin -> về trang chủ
+        router.push('/');
+      }
+    };
+
+    checkAccess();
+  }, [router]);
 
   const handleLogout = () => {
-    logout();
-    router.push('/login'); // chuyển hướng về login sau khi logout
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
   };
+
+  if (!authorized) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        Đang kiểm tra quyền truy cập...
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', display: 'flex' }}>
-      {/* Sidebar cố định */}
+      {/* Sidebar */}
       <aside style={{ width: 280, backgroundColor: 'white', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column' }}>
-        {/* Logo */}
         <div style={{ padding: '20px 16px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ backgroundColor: '#f97316', padding: '8px', borderRadius: '12px' }}>
             <Compass size={22} color="white" />
@@ -62,7 +86,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <span style={{ fontWeight: 'bold', fontSize: '18px', letterSpacing: '-0.5px' }}>SkyTrip Admin</span>
         </div>
 
-        {/* Admin info card */}
         <div style={{ margin: '20px 16px 0 16px', padding: '12px', background: 'linear-gradient(135deg, #fff7ed, #fee2e2)', borderRadius: '16px', border: '1px solid #fed7aa' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '18px' }}>A</div>
@@ -73,7 +96,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </div>
 
-        {/* Menu items - mỗi item là card, không có mô tả */}
         <nav style={{ flex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
@@ -92,20 +114,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '12px 16px' }}>
-                  <div style={{ 
-                    padding: '8px', 
-                    borderRadius: '12px', 
-                    backgroundColor: isActive ? '#ffedd5' : '#f3f4f6',
-                    transition: 'all 0.2s'
-                  }}>
+                  <div style={{ padding: '8px', borderRadius: '12px', backgroundColor: isActive ? '#ffedd5' : '#f3f4f6' }}>
                     <item.icon size={20} color={isActive ? '#ea580c' : '#6b7280'} />
                   </div>
-                  <span style={{ 
-                    fontWeight: 500, 
-                    fontSize: '15px', 
-                    color: isActive ? '#c2410c' : '#374151',
-                    letterSpacing: '-0.3px'
-                  }}>
+                  <span style={{ fontWeight: 500, fontSize: '15px', color: isActive ? '#c2410c' : '#374151', letterSpacing: '-0.3px' }}>
                     {item.name}
                   </span>
                 </div>
@@ -114,10 +126,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        {/* Logout card */}
         <div style={{ padding: '16px', borderTop: '1px solid #e5e7eb' }}>
           <button
-            onClick={handleLogout} // thêm sự kiện onClick
+            onClick={handleLogout}
             style={{
               width: '100%',
               borderRadius: '14px',
@@ -146,9 +157,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Main content */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Header */}
         <header style={{ backgroundColor: 'white', borderBottom: '1px solid #e5e7eb', padding: '12px 24px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f9fafb', borderRadius: '40px', padding: '6px 14px', border: '1px solid #e5e7eb' }}>
             <Search size={16} color="#9ca3af" />
